@@ -1,0 +1,8 @@
+.navbar-fixed-top {
+    border-bottom: 3px solid #f0c419;
+}
+
+.navbar .divider-vertical {
+    background-color: #073e74;
+    border-right: 1px solid #0b3a68;/* #1e3c62; */
+}

@@ -1,0 +1,27 @@
+UCSF
+
+    @navbarBackground
+    #77aaaa
+    
+    @navbarBackgroundHighlight
+    #84bdbd
+    
+    @navbarText
+    #eeffff
+    
+    @navbarLinkColor
+    #eeffff
+
+UCB
+
+    @navbarBackground
+    #02305c
+    
+    @navbarBackgroundHighlight
+    #053462
+    
+    @navbarText
+    @white
+    
+    @navbarLinkColor
+    @white

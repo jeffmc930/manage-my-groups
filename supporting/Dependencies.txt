@@ -1,0 +1,23 @@
+In order to use the Google APIs, you have to install them into your local maven repo.
+From inside of the myt directory, issue the following commands:
+    
+mvn install:install-file -Dfile=lib/gdata-appsforyourdomain-1.0.jar -DgroupId=com.google \
+    -DartifactId=gdata.appsforyourdomain -Dversion=1.0 -Dpackaging=jar
+    
+mvn install:install-file -Dfile=lib/gdata-client-1.0.jar -DgroupId=com.google \
+    -DartifactId=gdata.client -Dversion=1.0 -Dpackaging=jar
+    
+mvn install:install-file -Dfile=lib/gdata-core-1.47.1.jar -DgroupId=com.google \
+    -DartifactId=gdata.core -Dversion=1.47.1 -Dpackaging=jar
+    
+mvn install:install-file -Dfile=lib/guava-11.0.2.jar -DgroupId=com.google \
+    -DartifactId=guava -Dversion=11.0.2 -Dpackaging=jar
+    
+mvn install:install-file -Dfile=lib/jsr305.jar -DgroupId=com.google \
+    -DartifactId=jsr305 -Dversion=305 -Dpackaging=jar
+    
+mvn install:install-file -Dfile=lib/google-oauth-client-1.17.0-rc.jar -DgroupId=com.google \
+    -DartifactId=google.oauth.client -Dversion=1.17.0 -Dpackaging=jar
+
+mvn install:install-file -Dfile=lib/google-http-client-1.17.0-rc.jar -DgroupId=com.google \
+    -DartifactId=google.http.client -Dversion=1.17.0 -Dpackaging=jar

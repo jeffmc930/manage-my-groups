@@ -1,0 +1,11 @@
+.DS_Store
+.classpath
+.project
+.settings
+stacktrace.log
+target
+target-eclipse
+temp
+*.db
+*.log
+*.log.*
