@@ -18,7 +18,7 @@
     <!-- <div class="alert alert-info"><p><g:message code="bapps.index.deleteNote" /></p></div> -->
 
     <h2><g:message code="bapps.index.optionsHeading" /></h2>
-    <hr>
+
     <ul class="options-list buttons">
         <li>
             <g:form controller="bapps" action="set" id="${account.getLogin().getUserName()}" method="get" name="set">
@@ -28,7 +28,7 @@
             </g:form>
         </li>
     </ul>
-	<hr>
+
 	<h2>&nbsp&nbsp&nbsp<g:message code="bapps.index.groupsOwnedHeading" /></h2>
 	<p>
 	<table class="table">
