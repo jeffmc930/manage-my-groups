@@ -20,7 +20,7 @@ class BootStrap {
         // Set up the calmail database rows.
         environments {
             development {
-                //createAccounts()
+                createAccounts()
             }
             test {
                 //createAccounts()
