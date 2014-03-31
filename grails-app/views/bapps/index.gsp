@@ -28,7 +28,7 @@
             </g:form>
         </li>
     </ul>
-	<hr>
+
 	<h2>&nbsp&nbsp&nbsp<g:message code="bapps.index.groupsOwnedHeading" /></h2>
 	<p>
 	<table class="table">
