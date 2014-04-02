@@ -90,10 +90,14 @@ def ldapService
 		// Use LDAP service to get the names
 		def entries = ldapService.findNamesById(person.getAttributeValue(grailsApplication.config.ldap.personIdAttr))
 		for (entry in entries){
-			if (!entry.getAttributeValue(grailsApplication.config.ldap.nameSpaceNameAttr).contains('@') &&
-				(!(entry.getAttributeValue(grailsApplication.config.ldap.nameSpaceNameAttr) =~ /^cads/)) &&
+			if (
+				!entry.getAttributeValue(grailsApplication.config.ldap.nameSpaceNameAttr).contains('@') &&
+				!(entry.getAttributeValue(grailsApplication.config.ldap.nameSpaceNameAttr) =~ /^cads/) &&
 				!entry.getAttribute(grailsApplication.config.ldap.nameSpaceServiceAttr)
-								.hasValue(grailsApplication.config.ldap.cGbCServiceName)){
+								.hasValue(grailsApplication.config.ldap.calnetServiceName) &&
+				!entry.getAttribute(grailsApplication.config.ldap.nameSpaceServiceAttr)
+								.hasValue(grailsApplication.config.ldap.cGbCServiceName)
+				){
 					reuseNames.add(entry.getAttributeValue(grailsApplication.config.ldap.nameSpaceNameAttr))
 					print "Using name: " + entry.getAttributeValue(grailsApplication.config.ldap.nameSpaceNameAttr)
 			} else {

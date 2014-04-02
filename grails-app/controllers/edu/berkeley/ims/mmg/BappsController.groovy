@@ -196,6 +196,8 @@ class BappsController {
 				'existingGroupNames': existingGroupNames,
 				'gName': params.gName])
 		} else {
+			flash.error = message(code: 'bapps.alert.save.error.retry')
+            flash.title = message(code: 'bapps.alert.save.errorForTitle')
 			def existingGroupNamesIfError = nameSpaceService.getExistingGroupNames(session.person)
 	        return new ModelAndView('/bapps/update',
 				['account':currentAccount, 

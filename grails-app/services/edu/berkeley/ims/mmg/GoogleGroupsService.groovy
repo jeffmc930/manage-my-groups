@@ -168,7 +168,8 @@ class GoogleGroupsService {
 		
 		def resultsManager = addGroupManager(groupName, settings.manager)
 		def resultsSettings = updateGroupSettings(groupName, settings)
-		if (resultsManager && resultsSettings) {
+		def resultsAlias = addGroupAlias(groupName)
+		if (resultsManager && resultsSettings && resultsAlias) {
 			return true
 		} else {
 			return false
@@ -261,7 +262,7 @@ class GoogleGroupsService {
 		
   			String URI = grailsApplication.config.gGroups.directory.group.URI + 
 						"/${groupName}@${grailsApplication.config.gGroups.domain}/members"
-			print "URI is: ${URI}"
+			log.info ("URI is: ${URI}")
 		   	// Update the Group
 	       	HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(CREDENTIAL)
 	       	GenericUrl url = new GenericUrl(URI)
@@ -270,7 +271,7 @@ class GoogleGroupsService {
 		   	JSONObject jsonObj = new JSONObject()
 		   	jsonObj.put("email", manager)
 		   	jsonObj.put("role", "MANAGER")
-	
+		
 		   	// Create the Post Request
 	       	HttpRequest request = requestFactory.buildPostRequest(url, 
 							ByteArrayContent.fromString("application/json", jsonObj.toJSONString()))
@@ -285,9 +286,43 @@ class GoogleGroupsService {
         	log.error(e.getMessage())
         	return false
        	}
-		
+	} // end addGroupManager
 	
-	}
+	/* add group alias
+	** @param groupName
+	*/
+	def addGroupAlias(groupName) {
+	
+		try {
+		
+  			String URI = grailsApplication.config.gGroups.directory.group.URI + 
+						"/${groupName}@${grailsApplication.config.gGroups.domain}/aliases"
+			String alias = "${groupName}@${grailsApplication.config.gGroups.emailalias.domain}"
+			
+			log.info ("URI is: ${URI}")
+			
+		   	// Update the Group
+	       	HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(CREDENTIAL)
+	       	GenericUrl url = new GenericUrl(URI)
+			
+	   		// Setup the JSON info
+		   	JSONObject jsonObj = new JSONObject()
+		   	jsonObj.put("alias", alias)
+	
+		   	// Create the Post Request
+	       	HttpRequest request = requestFactory.buildPostRequest(url, 
+							ByteArrayContent.fromString("application/json", jsonObj.toJSONString()))
+	       	request.getHeaders().setContentType("application/json")
+	       	HttpResponse response = request.execute()
+	       	String content = response.parseAsString()
+			log.info (content)
+			return response.isSuccessStatusCode()
+
+      	} catch (IOException | InterruptedException e) {
+        	log.error(e.getMessage())
+        	return false
+       	}
+	} // end addGroupAlias
 	
 	/* add group member
 	** @param groupName
