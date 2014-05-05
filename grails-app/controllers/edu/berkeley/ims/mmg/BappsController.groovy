@@ -53,9 +53,12 @@ class BappsController {
      * so we can assume that if it is not set here, the user needs to choose.
      */
     def index() { 
+		// GroupNames are owned by the person's UID
+		// This will change when department names have their own UID
 		def existingGroupNames = nameSpaceService.getExistingGroupNames(session.person)
+		def groupsIsManager = googleGroupsService.findGroupsForManager(currentAccount, existingGroupNames)
        return new ModelAndView('/bapps/index',
-            ['account':currentAccount, 'calMailAccount':calMailAccount, 'existingGroupNames': existingGroupNames])
+            ['account':currentAccount, 'calMailAccount':calMailAccount, 'existingGroupNames': groupsIsManager])
     }
     
     /**
@@ -64,18 +67,14 @@ class BappsController {
      * account set as the id.
      */
     def choose() {
-		print "we are in choose"
         if (session.googleAppsAccounts?.size() == 1) {
-		print "one account"
             redirect(action:'index')
         }
         
         if (params.id) {
-		    print "params is set"
             redirect(action:'index', id:params.id)
         }
         else {
-			print "set to choose"
             return new ModelAndView('/bapps/choose',
                 ['accounts':session.googleAppsAccounts])
         }
@@ -107,8 +106,6 @@ class BappsController {
               	cmd.errors.allErrors.each { 
                     errorsForTitle = "${errorsForTitle} ${messageSource.getMessage(it, request.getLocale())}"
                 }
-				print "Text from newGroupName: " + params.newGroupName
-				print "Text from reuseGroupName: " + params.reuseGroupName
 				
                 flash.title = message(code: 'bapps.alert.save.errorForTitle') + errorsForTitle
                 return new ModelAndView('/bapps/set',
@@ -164,7 +161,6 @@ class BappsController {
      * Allows the user to add themselves as manager, add a description and other settings
      */
     def update(GoogleAppsCommand cmd) {
-		print "has errors: ${cmd.hasErrors()}"
 		if (cmd.hasErrors()) {
              def errorsForTitle = ''
            	cmd.errors.allErrors.each { 
@@ -173,36 +169,36 @@ class BappsController {
              flash.title = message(code: 'bapps.alert.update.errorForTitle') + errorsForTitle
 			 flash.error = errorsForTitle
 			def existingGroupNamesIfDescError = nameSpaceService.getExistingGroupNames(session.person)
+			def groupsIsManagerIfDescError = googleGroupsService.findGroupsForManager(currentAccount, existingGroupNamesIfDescError)
 	        return new ModelAndView('/bapps/update',
 				['account':currentAccount, 
 				'calMailAccount':calMailAccount, 
-				'existingGroupNames': existingGroupNamesIfDescError,
+				'existingGroupNames': groupsIsManagerIfDescError,
 				'description': params.description,
 				'gName': params.gName])
         }
-       	print "description: ${params.description}"
-		print "manager: ${params.managerAccount}"
 		def settings = ['description': params.description,
 						'manager': params.managerAccount
 						]
-		print "Group Name: ${params.gName}"
 		flash.error = ""
 		def results = googleGroupsService.updateGroupAll(params.gName, settings)
 		if (results) {
 			def existingGroupNames = nameSpaceService.getExistingGroupNames(session.person)
+			def groupsIsManager = googleGroupsService.findGroupsForManager(currentAccount, existingGroupNames)
 	        return new ModelAndView('/bapps/index',
 				['account':currentAccount, 
 				'calMailAccount':calMailAccount, 
-				'existingGroupNames': existingGroupNames,
+				'existingGroupNames': groupsIsManager,
 				'gName': params.gName])
 		} else {
 			flash.error = message(code: 'bapps.alert.save.error.retry')
             flash.title = message(code: 'bapps.alert.save.errorForTitle')
 			def existingGroupNamesIfError = nameSpaceService.getExistingGroupNames(session.person)
+			def groupsIsManagerIfError = googleGroupsService.findGroupsForManager(currentAccount, existingGroupNamesIfError)
 	        return new ModelAndView('/bapps/update',
 				['account':currentAccount, 
 				'calMailAccount':calMailAccount, 
-				'existingGroupNames': existingGroupNamesIfError,
+				'existingGroupNames': groupsIsManagerIfError,
 				'description': params.description,
 				'gName': params.gName])
 			
@@ -262,13 +258,10 @@ class BappsController {
     protected accountFromId() {
         // Only do this if the user has any Google apps. If not, then the
         // SecurityFilter will pick it up.
-		print "in accountFromId"
         if (session.googleAppsAccounts) {
 			print "in accountFromId session"
             if (params.id) {
-				print "in params.id"
                 session.googleAppsAccounts.each {
-					print "googleAppsAccounts: " + it.getLogin().getUserName()
                     if (it.getLogin().getUserName() == params.id) {
                         currentAccount = it
                         currentUsername = it.getLogin().getUserName()
@@ -278,22 +271,18 @@ class BappsController {
             else if (session.googleAppsAccounts.size() == 1) {
                 currentAccount = session.googleAppsAccounts[0]
                 currentUsername = currentAccount.getLogin().getUserName()
-				print "currentUsername: " + currentAccount.getLogin().getUserName()
             }
         
             if (!currentAccount) {
-				print "in NOT currentAccount"
-				print "Number of accounts: " + session.googleAppsAccounts.size()
-				session.googleAppsAccounts.size() == 1 ? print("to index") : print("to choose")
 				currentAccount = session.googleAppsAccounts[0]
                 currentUsername = currentAccount.getLogin().getUserName()
                 session.googleAppsAccounts.size() == 1 ? redirect(action:'index') : redirect(action:'choose')
+				return false
             }
         }
         // If the currentAccount is set, now pull out the actual account from
         // the CalMail database
         if (currentAccount) {
-			print "currentAccount: " + currentAccount.getLogin().getUserName()
             calMailAccount = calMailService.account(
                 session.person, currentAccount.getLogin().getUserName())
         }

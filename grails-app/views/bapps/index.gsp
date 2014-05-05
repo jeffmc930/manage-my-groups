@@ -49,7 +49,7 @@
 				<td>
 				<strong>
 				<a href="${grailsApplication.config.gGroups.addressLinkPrefix}${it}${grailsApplication.config.gGroups.addressLinkSuffix}">
-				${it}</a>
+				${it}&#64;${grailsApplication.config.gGroups.domain}</a>
 				</strong>
 				</td>
 				<td class="controls">

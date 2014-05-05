@@ -47,6 +47,8 @@ import javax.xml.transform.stream.StreamSource
 
 // JSON Simple
 import org.json.simple.JSONObject 
+import org.json.simple.JSONArray
+import org.json.simple.JSONValue
 
 
 @Transactional
@@ -323,6 +325,68 @@ class GoogleGroupsService {
         	return false
        	}
 	} // end addGroupAlias
+	
+	
+	/* find groups for manage_id
+	** @param manager_id
+	*/
+	def findGroupsForManager(currentAccount, existingGroupNames) {
+	
+		try {
+		
+			doSetup()
+			
+			def groupsIsManager = []
+			def String manager = currentAccount.getLogin().getUserName() + "@${grailsApplication.config.mmg.gAppsUserDomain}"
+			
+			existingGroupNames.each {
+				def fullGroupName = it + "@${grailsApplication.config.gGroups.domain}"
+				isGroupManager(manager, fullGroupName) ? groupsIsManager.add(it) : log.info("${it} is not included.")
+				}
+			return groupsIsManager
+		
+
+      	} catch (IOException | InterruptedException e) {
+        	log.error(e.getMessage())
+        	return groupsIsManager
+       	}
+	} // end findGroupsForManager
+	
+	
+	/* Check if manager is group manager for group
+	** @param manager_id
+	** @param groupName
+	*/
+	def isGroupManager(manager, groupName) {
+	
+		try {
+					
+  			String URI = grailsApplication.config.gGroups.directory.group.URI + 
+						"/${groupName}/members/${manager}"
+			log.info ("URI is: ${URI}")
+		   	// Update the Group
+	       	HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(CREDENTIAL)
+	       	GenericUrl url = new GenericUrl(URI)
+		
+		   	// Create the Get Request
+	       	HttpRequest request = requestFactory.buildGetRequest(url)
+	       	request.getHeaders().setContentType("application/json")
+	       	HttpResponse response = request.execute()
+	       	String content = response.parseAsString()
+			log.info (content)
+			Object obj=JSONValue.parse(content)
+			print obj.get("role")
+			return obj.get("role").equals("MANAGER")
+			
+		
+
+      	} catch (IOException | InterruptedException e) {
+        	log.error(e.getMessage())
+        	return false
+       	}
+	} // end isGroupManager
+	
+	
 	
 	/* add group member
 	** @param groupName
